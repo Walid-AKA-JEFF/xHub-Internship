@@ -1,0 +1,250 @@
+body {
+    background: #f4f6fb;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 500px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 32px 24px;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 24px;
+}
+
+.post {
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.post h2 {
+    margin: 0 0 10px;
+}
+
+.post p {
+    margin: 0;
+}
+
+button {
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    padding: 10px 0;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background: #4f46e5;
+}
+
+form {
+    margin: 20px 0;
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #dddddd;
+}
+
+form input[type="text"],
+form textarea {
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: #f9fafb;
+    transition: border 0.2s;
+}
+
+form input[type="text"]:focus, textarea:focus {
+    border: 1.5px solid #6366f1;
+    outline: none;
+    background: #fff;
+}
+
+form input[type="submit"] {
+    background: #35424a;
+    color: #ffffff;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+form input[type="submit"]:hover {
+    background: #45a049;
+}
+
+#postsContainer {
+    margin-top: 24px;
+}
+
+#postsList {
+    list-style: none;
+    padding: 0;
+}
+
+#postsList li {
+    background: #f3f4f6;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    padding: 16px 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#postsList strong {
+    color: #22223b;
+    font-size: 1.1rem;
+}
+
+#postsList button {
+    margin-right: 8px;
+    margin-top: 4px;
+    width: 80px;
+    align-self: flex-end;
+}
+
+#postsList button:last-child {
+    background: #ef4444;
+}
+
+#postsList button:last-child:hover {
+    background: #dc2626;
+}
+
+/* Style edit inputs in posts list */
+#postsList input[type="text"],
+#postsList textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 7px;
+    font-size: 1rem;
+    background: #f1f5f9;
+    color: #22223b;
+    margin-bottom: 10px;
+    transition: border 0.2s, background 0.2s;
+    resize: none;
+}
+
+#postsList input[type="text"]:focus,
+#postsList textarea:focus {
+    border: 1.5px solid #6366f1;
+    background: #fff;
+    outline: none;
+}
+
+/* Style Save and Cancel buttons in edit mode */
+#postsList .edit-btn {
+    background: linear-gradient(90deg, #6366f1 60%, #60a5fa 100%);
+    color: #fff;
+    border: none;
+    padding: 10px 0;
+    border-radius: 7px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 90px;
+    margin-right: 8px;
+    margin-top: 4px;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+}
+
+#postsList .edit-btn:hover {
+    background: linear-gradient(90deg, #4f46e5 60%, #2563eb 100%);
+}
+
+#postsList .cancel-btn {
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    padding: 10px 0;
+    border-radius: 7px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 90px;
+    margin-top: 4px;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(239,68,68,0.08);
+}
+
+#postsList .cancel-btn:hover {
+    background: #dc2626;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 32px;
+    background: #f8fafc;
+    padding: 18px 16px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.form-container input[type="text"],
+.form-container textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 7px;
+    font-size: 1rem;
+    background: #f1f5f9;
+    color: #22223b;
+    transition: border 0.2s, background 0.2s;
+    resize: none;
+}
+
+.form-container input[type="text"]:focus,
+.form-container textarea:focus {
+    border: 1.5px solid #6366f1;
+    background: #fff;
+    outline: none;
+}
+
+#addPostBtn {
+    background: linear-gradient(90deg, #6366f1 60%, #60a5fa 100%);
+    color: #fff;
+    border: none;
+    padding: 12px 0;
+    border-radius: 7px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+}
+
+#addPostBtn:hover {
+    background: linear-gradient(90deg, #4f46e5 60%, #2563eb 100%);
+    box-shadow: 0 4px 16px rgba(99,102,241,0.12);
+}
+
+/* Responsive for mobile */
+@media (max-width: 600px) {
+    .container {
+        padding: 12px 4px;
+    }
+    .form-container {
+        padding: 10px 4px;
+    }
+}

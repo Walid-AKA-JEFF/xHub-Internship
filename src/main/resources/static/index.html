@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer CRUD Interface</title>
+    <link rel="stylesheet" href="/css/customer-animations.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            color: #555;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .update-btn {
+            background-color: #28a745;
+        }
+        .update-btn:hover {
+            background-color: #218838;
+        }
+        .customers-list {
+            margin-top: 20px;
+        }
+        .customer-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .response {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+<h1>Customer CRUD Interface</h1>
+
+<!-- Create Customer -->
+<div class="container">
+    <h2>Create New Customer</h2>
+    <div class="form-group">
+        <label for="createName">Name:</label>
+        <input type="text" id="createName" placeholder="Enter customer name">
+    </div>
+    <div class="form-group">
+        <label for="createAddress">Address:</label>
+        <input type="text" id="createAddress" placeholder="Enter customer address">
+    </div>
+    <button onclick="createCustomer()">Create Customer</button>
+    <div id="createResponse" class="response" style="display: none;"></div>
+</div>
+
+<!-- Read All Customers -->
+<div class="container">
+    <h2>All Customers</h2>
+    <button onclick="getAllCustomers()">Load All Customers</button>
+    <div id="allCustomersResponse" class="response" style="display: none;"></div>
+    <div id="customersList" class="customers-list"></div>
+</div>
+
+<!-- Read Single Customer -->
+<div class="container">
+    <h2>Get Customer by ID</h2>
+    <div class="form-group">
+        <label for="getCustomerId">Customer ID:</label>
+        <input type="number" id="getCustomerId" placeholder="Enter customer ID">
+    </div>
+    <button onclick="getCustomerById()">Get Customer</button>
+    <div id="getCustomerResponse" class="response" style="display: none;"></div>
+</div>
+
+<!-- Update Customer -->
+<div class="container">
+    <h2>Update Customer</h2>
+    <div class="form-group">
+        <label for="updateId">Customer ID:</label>
+        <input type="number" id="updateId" placeholder="Enter customer ID to update">
+    </div>
+    <div class="form-group">
+        <label for="updateName">New Name:</label>
+        <input type="text" id="updateName" placeholder="Enter new name">
+    </div>
+    <div class="form-group">
+        <label for="updateAddress">New Address:</label>
+        <input type="text" id="updateAddress" placeholder="Enter new address">
+    </div>
+    <button class="update-btn" onclick="updateCustomer()">Update Customer</button>
+    <div id="updateResponse" class="response" style="display: none;"></div>
+</div>
+
+<!-- Delete Customer -->
+<div class="container">
+    <h2>Delete Customer</h2>
+    <div class="form-group">
+        <label for="deleteId">Customer ID:</label>
+        <input type="number" id="deleteId" placeholder="Enter customer ID to delete">
+    </div>
+    <button class="delete-btn" onclick="deleteCustomer()">Delete Customer</button>
+    <div id="deleteResponse" class="response" style="display: none;"></div>
+</div>
+
+<script>
+    const API_BASE_URL = 'http://localhost:8080/api/customers';
+    let eventSource;
+
+    // Initialize SSE connection
+    function initCustomerEvents() {
+        console.log('Initializing SSE connection...');
+        eventSource = new EventSource('/api/customer-events/subscribe');
+
+        // Handle customer created events
+        eventSource.addEventListener('customer-create', function(event) {
+            console.log('CREATE event received:', event);
+            const eventData = JSON.parse(event.data);
+            const customerData = JSON.parse(eventData.customerData);
+            console.log('Customer created:', customerData);
+            // Add to list without full refresh
+            addNewCustomerToList(customerData);
+        });
+
+        // Handle customer updated events
+        eventSource.addEventListener('customer-update', function(event) {
+            console.log('UPDATE event received:', event);
+            const eventData = JSON.parse(event.data);
+            const customerData = JSON.parse(eventData.customerData);
+            console.log('Customer updated:', customerData);
+            // Update in list without full refresh
+            updateCustomerInList(customerData);
+        });
+
+        // Handle customer deleted events
+        eventSource.addEventListener('customer-delete', function(event) {
+            console.log('DELETE event received:', event);
+            const eventData = JSON.parse(event.data);
+            console.log('Customer deleted, ID:', eventData.customerId);
+            // Remove from list without full refresh
+            removeCustomerFromList(eventData.customerId);
+        });
+
+        // Handle connection error
+        eventSource.onerror = function() {
+            console.error('SSE connection error');
+            // Close the current connection
+            eventSource.close();
+            // Attempt to reconnect after a delay
+            setTimeout(() => {
+                initCustomerEvents();
+            }, 5000);
+        };
+    }
+
+    // Create Customer
+    async function createCustomer() {
+        const name = document.getElementById('createName').value;
+        const address = document.getElementById('createAddress').value;
+
+        if (!name || !address) {
+            showResponse('createResponse', 'Please fill in all fields', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(API_BASE_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, address })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                showResponse('createResponse', `Customer created successfully:\n${JSON.stringify(data, null, 2)}`, 'success');
+                document.getElementById('createName').value = '';
+                document.getElementById('createAddress').value = '';
+                // No need to refresh - SSE will handle this
+            } else {
+                const errorText = await response.text();
+                showResponse('createResponse', `Error: ${response.status} - ${errorText}`, 'error');
+            }
+        } catch (error) {
+            showResponse('createResponse', `Error: ${error.message}`, 'error');
+        }
+    }
+
+    // Get All Customers
+    async function getAllCustomers() {
+        try {
+            const response = await fetch(API_BASE_URL);
+
+            if (response.ok) {
+                const data = await response.json();
+                showResponse('allCustomersResponse', `${data.length} customers found`, 'success');
+                displayCustomers(data);
+            } else {
+                const errorText = await response.text();
+                showResponse('allCustomersResponse', `Error: ${response.status} - ${errorText}`, 'error');
+            }
+        } catch (error) {
+            showResponse('allCustomersResponse', `Error: ${error.message}`, 'error');
+        }
+    }
+
+    // Get Customer by ID
+    async function getCustomerById() {
+        const id = document.getElementById('getCustomerId').value;
+
+        if (!id) {
+            showResponse('getCustomerResponse', 'Please enter a customer ID', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/${id}`);
+
+            if (response.ok) {
+                const data = await response.json();
+                showResponse('getCustomerResponse', `Customer found:\n${JSON.stringify(data, null, 2)}`, 'success');
+            } else {
+                const errorText = await response.text();
+                showResponse('getCustomerResponse', `Error: ${response.status} - ${errorText}`, 'error');
+            }
+        } catch (error) {
+            showResponse('getCustomerResponse', `Error: ${error.message}`, 'error');
+        }
+    }
+
+    // Update Customer
+    async function updateCustomer() {
+        const id = document.getElementById('updateId').value;
+        const name = document.getElementById('updateName').value;
+        const address = document.getElementById('updateAddress').value;
+
+        if (!id || !name || !address) {
+            showResponse('updateResponse', 'Please fill in all fields', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, address })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                showResponse('updateResponse', `Customer updated successfully:\n${JSON.stringify(data, null, 2)}`, 'success');
+                // No need to refresh - SSE will handle this
+            } else {
+                const errorText = await response.text();
+                showResponse('updateResponse', `Error: ${response.status} - ${errorText}`, 'error');
+            }
+        } catch (error) {
+            showResponse('updateResponse', `Error: ${error.message}`, 'error');
+        }
+    }
+
+    // Delete Customer
+    async function deleteCustomer() {
+        const id = document.getElementById('deleteId').value;
+
+        if (!id) {
+            showResponse('deleteResponse', 'Please enter a customer ID', 'error');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to delete this customer?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                showResponse('deleteResponse', `Customer with ID ${id} deleted successfully`, 'success');
+                // No need to refresh - SSE will handle this
+            } else {
+                const errorText = await response.text();
+                showResponse('deleteResponse', `Error: ${response.status} - ${errorText}`, 'error');
+            }
+        } catch (error) {
+            showResponse('deleteResponse', `Error: ${error.message}`, 'error');
+        }
+    }
+
+    // Helper function to show responses
+    function showResponse(elementId, message, type) {
+        const element = document.getElementById(elementId);
+        element.style.display = 'block';
+        element.textContent = message;
+        element.className = `response ${type}`;
+    }
+
+    // Display customers in a nice format
+    function displayCustomers(customers) {
+        const customersList = document.getElementById('customersList');
+
+        if (customers.length === 0) {
+            customersList.innerHTML = '<p>No customers found.</p>';
+            return;
+        }
+
+        customersList.innerHTML = customers.map(customer => `
+                <div class="customer-item" id="customer-${customer.id}">
+                    <strong>ID:</strong> ${customer.id}<br>
+                    <strong>Name:</strong> ${customer.name}<br>
+                    <strong>Address:</strong> ${customer.address}
+                </div>
+            `).join('');
+    }
+
+    // Add a single new customer to the list without refreshing
+    function addNewCustomerToList(customer) {
+        const customersList = document.getElementById('customersList');
+        const noCustomersMessage = customersList.querySelector('p');
+
+        if (noCustomersMessage) {
+            customersList.innerHTML = '';
+        }
+
+        const customerElement = document.createElement('div');
+        customerElement.className = 'customer-item new-customer';
+        customerElement.id = `customer-${customer.id}`;
+        customerElement.innerHTML = `
+            <strong>ID:</strong> ${customer.id}<br>
+            <strong>Name:</strong> ${customer.name}<br>
+            <strong>Address:</strong> ${customer.address}
+        `;
+
+        customersList.appendChild(customerElement);
+    }
+
+    // Update a customer in the list without refreshing
+    function updateCustomerInList(customer) {
+        const customerElement = document.getElementById(`customer-${customer.id}`);
+
+        if (customerElement) {
+            customerElement.className = 'customer-item updated-customer';
+            customerElement.innerHTML = `
+                <strong>ID:</strong> ${customer.id}<br>
+                <strong>Name:</strong> ${customer.name}<br>
+                <strong>Address:</strong> ${customer.address}
+            `;
+        } else {
+            // If not found, just add it
+            addNewCustomerToList(customer);
+        }
+    }
+
+    // Remove a customer from the list without refreshing
+    function removeCustomerFromList(customerId) {
+        const customerElement = document.getElementById(`customer-${customerId}`);
+
+        if (customerElement) {
+            customerElement.className = 'customer-item deleted-customer';
+            setTimeout(() => {
+                customerElement.remove();
+
+                // Check if list is now empty
+                const customersList = document.getElementById('customersList');
+                if (customersList.children.length === 0) {
+                    customersList.innerHTML = '<p>No customers found.</p>';
+                }
+            }, 1000); // Remove after animation completes
+        }
+    }
+
+    // Load all customers when page loads and initialize SSE
+    window.onload = function() {
+        getAllCustomers();
+        initCustomerEvents();
+    };
+</script>
+</body>
+</html>

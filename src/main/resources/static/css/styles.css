@@ -1,0 +1,30 @@
+/* Animation for new customer rows */
+@keyframes highlight-new {
+    0% { background-color: #b3ffb3; }
+    100% { background-color: transparent; }
+}
+
+/* Animation for updated customer rows */
+@keyframes highlight-update {
+    0% { background-color: #fff2b3; }
+    100% { background-color: transparent; }
+}
+
+/* Animation for rows about to be deleted */
+@keyframes highlight-delete {
+    0% { background-color: #ffb3b3; }
+    100% { opacity: 0; }
+}
+
+/* Apply animations */
+tr.new-customer {
+    animation: highlight-new 2s ease-out;
+}
+
+tr.updated-customer {
+    animation: highlight-update 2s ease-out;
+}
+
+tr.deleted-customer {
+    animation: highlight-delete 1s ease-out;
+}

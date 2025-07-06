@@ -1,0 +1,30 @@
+/* Animation for new customer items */
+@keyframes highlight-new {
+    0% { background-color: #d4edda; }
+    100% { background-color: #f8f9fa; }
+}
+
+/* Animation for updated customer items */
+@keyframes highlight-update {
+    0% { background-color: #fff3cd; }
+    100% { background-color: #f8f9fa; }
+}
+
+/* Animation for items about to be deleted */
+@keyframes highlight-delete {
+    0% { background-color: #f8d7da; }
+    100% { opacity: 0; }
+}
+
+/* Apply animations */
+.new-customer {
+    animation: highlight-new 2s ease-out;
+}
+
+.updated-customer {
+    animation: highlight-update 2s ease-out;
+}
+
+.deleted-customer {
+    animation: highlight-delete 1s ease-out;
+}
